@@ -32,7 +32,7 @@ export const menuData: Menus[] = [
       },
       {
         index: "/product-shop",
-        title: "订单管理管理",
+        title: "订单管理",
       },
     ],
   },
