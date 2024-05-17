@@ -13,7 +13,10 @@ const service: AxiosInstance = axios.create({
 });
 
 service.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
+  (config: any) => {
+    if (config.isFormData) {
+      config.headers["Content-Type"] = "multipart/form-data";
+    }
     return config;
   },
   (error: AxiosError) => {
