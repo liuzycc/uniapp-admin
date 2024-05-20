@@ -147,8 +147,9 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   NProgress.start();
-  const role = localStorage.getItem("vuems_name");
-  const permiss = usePermissStore();
+  // const role = localStorage.getItem("vuems_name");
+  // const permiss = usePermissStore();
+  console.log("我切换了");
 
   //   if (!role && to.meta.noAuth !== true) {
   //     next("/login");

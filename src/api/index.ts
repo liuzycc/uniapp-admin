@@ -28,3 +28,17 @@ export const uploadImage = (data: any) =>
   request({ url: "/image/upload", method: "post", data, isFormData: true });
 // 分类
 export const getSortList = () => request({ url: "/sort/list", method: "get" });
+// 添加分类
+export const addSortList = (data) =>
+  request({ url: "/sort/create", method: "post", data });
+// 删除分类
+export const removeSortList = (data) =>
+  request({ url: "/sort/remove", method: "post", data });
+
+// 产品
+export const getProductList = () =>
+  request({ url: "/product/list", method: "get" });
+
+// 添加产品
+// 更新产品
+// 删除产品

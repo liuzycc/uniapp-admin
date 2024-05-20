@@ -347,13 +347,13 @@
 
 "@wangeditor/editor-for-vue@^5.1.12":
   version "5.1.12"
-  resolved "https://registry.yarnpkg.com/@wangeditor/editor-for-vue/-/editor-for-vue-5.1.12.tgz#f7d5f239b39cdfc01d31151488de8443fe6edc64"
-  integrity sha512-0Ds3D8I+xnpNWezAeO7HmPRgTfUxHLMd9JKcIw+QzvSmhC5xUHbpCcLU+KLmeBKTR/zffnS5GQo6qi3GhTMJWQ==
+  resolved "http://mvn.ziroom.com/api/npm/ziroom-npm/@wangeditor/editor-for-vue/-/editor-for-vue-5.1.12.tgz#f7d5f239b39cdfc01d31151488de8443fe6edc64"
+  integrity sha1-99XyObOc38AdMRUUiN6EQ/5u3GQ=
 
 "@wangeditor/editor@^5.1.23":
   version "5.1.23"
-  resolved "https://registry.yarnpkg.com/@wangeditor/editor/-/editor-5.1.23.tgz#c9d2007b7cb0ceef6b72692b4ee87b01ee2367b3"
-  integrity sha512-0RxfeVTuK1tktUaPROnCoFfaHVJpRAIE2zdS0mpP+vq1axVQpLjM8+fCvKzqYIkH0Pg+C+44hJpe3VVroSkEuQ==
+  resolved "http://mvn.ziroom.com/api/npm/ziroom-npm/@wangeditor/editor/-/editor-5.1.23.tgz#c9d2007b7cb0ceef6b72692b4ee87b01ee2367b3"
+  integrity sha1-ydIAe3ywzu9rcmkrTuh7Ae4jZ7M=
   dependencies:
     "@uppy/core" "^2.1.1"
     "@uppy/xhr-upload" "^2.0.3"

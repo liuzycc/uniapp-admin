@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onActivated } from "vue";
 import { getUserList } from "@/api";
 const userList = ref([]);
 const userCurrentList = ref([]);
@@ -31,7 +31,11 @@ const page = {
   index: 1,
 };
 const showList = ref([]);
+onActivated(() => {
+  console.log("我来了", userList.value);
+});
 onMounted(async () => {
+  console.log("我进来了");
   await init();
 });
 const init = async () => {
