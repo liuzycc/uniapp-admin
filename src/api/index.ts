@@ -40,5 +40,9 @@ export const getProductList = () =>
   request({ url: "/product/list", method: "get" });
 
 // 添加产品
+export const addProductList = (data) =>
+  request({ url: "/product/create", method: "post", data });
 // 更新产品
+export const updateProductList = (data) =>
+  request({ url: "/product/update", method: "post", data });
 // 删除产品
