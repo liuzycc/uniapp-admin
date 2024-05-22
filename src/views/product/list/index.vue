@@ -56,9 +56,10 @@
     </div> -->
   </div>
   <ProductForm
-    v-model:isShow="dialogVisibleForm.isShow"
+    :isShow="dialogVisibleForm.isShow"
     :formInfo="dialogVisibleForm.formInfo"
     :sortList="dialogVisibleForm.sortList"
+    @close="handleProductClose"
     @submit="handleProductSubmit"
   />
 </template>
@@ -149,7 +150,8 @@ const init = async () => {
 const handleAddProcuct = () => {
   dialogVisibleForm.isShow = true;
 };
-const handleDetail = (item: any) => {
+const handleDetail = (t: any) => {
+  const item = JSON.parse(JSON.stringify(t));
   item.tags = JSON.parse(item.tags);
   item.imgs = JSON.parse(item.imgs);
   item.config = JSON.parse(item.config);
@@ -157,6 +159,10 @@ const handleDetail = (item: any) => {
   dialogVisibleForm.isShow = true;
 };
 const handleRemove = (item: any) => {};
+const handleProductClose = () => {
+  // debugger;
+  dialogVisibleForm.isShow = false;
+};
 const handleProductSubmit = async (item: any) => {
   try {
     if (Object.keys(dialogVisibleForm.formInfo).length) {

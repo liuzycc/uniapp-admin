@@ -1,10 +1,11 @@
 <template>
   <el-dialog
-    v-model="props.isShow"
+    v-model="model"
     title="商品详情"
     width="900"
     class="form-dialog-container"
     :overflow="true"
+    @close="handleClose"
   >
     <el-form :model="form" :rules="rules" ref="ruleFormRef">
       <el-form-item label="商品名称" prop="title" :label-width="formLabelWidth">
@@ -31,7 +32,11 @@
       </el-form-item>
 
       <el-form-item label="一级分类" prop="sort1" :label-width="formLabelWidth">
-        <el-select v-model="form.sort1" placeholder="请选择">
+        <el-select
+          v-model="form.sort1"
+          placeholder="请选择"
+          @change="form.sort2 = ''"
+        >
           <el-option
             v-for="(item, index) in sortList"
             :key="index"
@@ -224,7 +229,16 @@ const imgInfoState = {
   dialogImageUrl: "",
   fileList: [],
 };
-const emit = defineEmits(["update:isShow", "submit"]);
+const dialogFormConfigState = {
+  visible: false,
+  rowIndex: null,
+  form: {
+    name: "",
+    isMultiple: false,
+    list: [],
+  },
+};
+const emit = defineEmits(["close", "submit"]);
 const props = defineProps(["isShow", "formInfo", "sortList"]);
 const dialogFormVisible = ref(false);
 const formLabelWidth = "100px";
@@ -280,15 +294,10 @@ const rules = reactive({
     },
   ],
 });
+const model = ref(false);
 // config 弹窗
 const dialogFormConfig = reactive({
-  visible: false,
-  rowIndex: null,
-  form: {
-    name: "",
-    isMultiple: false,
-    list: [],
-  },
+  ...dialogFormConfigState,
 });
 // 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef();
@@ -303,15 +312,15 @@ const inputVisible = ref(false);
 const InputRef = ref<InstanceType<typeof ElInput>>();
 // 图片
 const imgInfo = reactive({ ...imgInfoState });
-// watch(
-//   () => props.isShow,
-//   (v: boolean) => {
-//     dialogFormVisible.value = v;
-//   },
-//   {
-//     immediate: true,
-//   }
-// );
+watch(
+  () => props.isShow,
+  (v: boolean) => {
+    model.value = v;
+  },
+  {
+    immediate: true,
+  }
+);
 watch(
   () => props.formInfo,
   (v: any) => {
@@ -402,20 +411,15 @@ const handleTableRemove = (item, index) => {
 // table cbfn end
 // config cbfn start
 const handledDialogFormConfigCale = () => {
-  dialogFormConfig.visible = false;
-  dialogFormConfig.form = {
-    name: "",
-    isMultiple: false,
-    list: [],
-  };
-  dialogFormConfig.rowIndex = null;
+  // 重置
+  Object.assign(dialogFormConfig, { ...dialogFormConfigState });
 };
 const handledDialogFormConfig = () => {
   const temp = {
     ...dialogFormConfig.form,
     list: dialogFormConfig.form.list.split(","),
   };
-  if (dialogFormConfig.rowIndex) {
+  if (dialogFormConfig.rowIndex != null) {
     // 修改
     form.config[dialogFormConfig.rowIndex] = temp;
   } else {
@@ -432,13 +436,13 @@ const handledDialogFormConfig = () => {
 };
 // config cbfn end
 const handleClose = () => {
-  emit("update:isShow", false);
+  emit("close", false);
 };
 const handleSubmit = async (ruleFormRef) => {
   if (!ruleFormRef) return;
   await ruleFormRef.validate((valid, fields) => {
     if (valid) {
-      emit("submit", form);
+      emit("submit", JSON.parse(JSON.stringify(form)));
     } else {
       console.log("error submit!", fields);
     }
