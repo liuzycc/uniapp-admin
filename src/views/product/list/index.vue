@@ -1,10 +1,50 @@
 <template>
   <div class="container">
     <p class="title">产品管理</p>
-    <div class="select-info">我是筛选区域</div>
+    <div class="select-info">
+      <el-form :model="findForm" label-width="auto">
+        <el-form-item label="商品名称">
+          <el-input v-model="findForm.title" clearable />
+        </el-form-item>
+        <el-form-item label="一级分类" prop="sort1">
+          <el-select
+            v-model="findForm.sort1"
+            placeholder="请选择"
+            @change="findForm.sort2 = ''"
+            clearable
+          >
+            <el-option
+              v-for="(item, index) in sortList"
+              :key="index"
+              :label="item.s1.title"
+              :value="item.s1.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="二级分类" prop="sort2">
+          <el-select v-model="findForm.sort2" placeholder="请选择" clearable>
+            <el-option
+              v-for="(item, index) in sort2List"
+              :key="index"
+              :label="item.title"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div class="find-btn" :style="{ textAlign: 'right' }">
+      <el-button type="primary" @click="handleFindListReset">重置</el-button>
+      <el-button type="primary" @click="handleFindList">查询</el-button>
+    </div>
     <el-button type="primary" @click="handleAddProcuct">添加产品</el-button>
-    <el-table :data="currentList" :border="false" style="width: 100%">
-      <el-table-column type="expand">
+    <el-table
+      v-loading="loaded"
+      :data="currentList"
+      :border="false"
+      style="width: 100%"
+    >
+      <!-- <el-table-column type="expand">
         <template #default="props">
           <div m="4">
             <p m="t-0 b-2">商品名称: {{ props.row.title }}</p>
@@ -12,7 +52,7 @@
             <p m="t-0 b-2">副标题: {{ props.row.subTitle }}</p>
           </div>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="商品名称" prop="title" />
       <el-table-column label="详情页展示名称" prop="showTitle" />
       <el-table-column label="缩略图" prop="thum">
@@ -38,22 +78,15 @@
         </template>
       </el-table-column>
     </el-table>
-    <!-- 编辑器 -->
-    <!-- <div style="border: 1px solid #ccc; margin-top: 10px">
-      <Toolbar
-        :editor="editorRef"
-        :defaultConfig="{}"
-        :mode="'default'"
-        style="border-bottom: 1px solid #ccc"
+    <div class="pagination">
+      <el-pagination
+        layout="prev, pager, next"
+        :page-size="pageNum"
+        :total="productList.length"
+        @current-change="handleChangeCurrent"
+        v-model:current-page="pageinationPage"
       />
-      <Editor
-        :defaultConfig="editorConfig"
-        :mode="'default'"
-        v-model="valueHtml"
-        style="height: 400px; overflow-y: hidden"
-        @onCreated="handleCreated"
-      />
-    </div> -->
+    </div>
   </div>
   <ProductForm
     :isShow="dialogVisibleForm.isShow"
@@ -71,6 +104,7 @@ import {
   onBeforeUnmount,
   shallowRef,
   watch,
+  computed,
 } from "vue";
 import {
   getProductList,
@@ -84,6 +118,20 @@ import "@wangeditor/editor/dist/css/style.css";
 import ProductForm from "./components/form.vue";
 import { ElMessage } from "element-plus";
 
+const findFormState = {
+  title: "",
+  sort1: "",
+  sort2: "",
+};
+const pageinationPage = ref(1);
+const findForm = reactive({
+  ...findFormState,
+});
+const sortList = ref([]);
+const sort2List = computed(() => {
+  if (!findForm.sort1) return [];
+  return sortList.value.find((item) => item.s1.id === findForm.sort1).s2;
+});
 const productList = ref([]);
 const currentList = ref([]);
 const loaded = ref(false);
@@ -94,25 +142,6 @@ const dialogVisibleForm = reactive({
   formInfo: {},
   sortList: [],
 });
-
-// // 编辑器实例，必须用 shallowRef
-// const editorRef = shallowRef();
-// // 内容 HTML
-// const valueHtml = ref("<p>hello</p>");
-// const editorConfig = reactive({
-//   placeholder: "请输入内容...",
-//   MENU_CONF: {
-//     uploadImage: {
-//       onBeforeUpload: () => {
-//         console.log("我来了");
-//       },
-//       customInsert: (res: any, insertFn) => {
-//         console.log("此功能无效");
-//         insertFn("");
-//       },
-//     },
-//   },
-// });
 watch(
   () => dialogVisibleForm.isShow,
   (v) => {
@@ -123,26 +152,37 @@ watch(
 onMounted(async () => {
   await init();
 });
-// // 组件销毁时，也及时销毁编辑器
-// onBeforeUnmount(() => {
-//   const editor = editorRef.value;
-//   if (editor == null) return;
-//   editor.destroy();
-// });
-// const handleCreated = (editor) => {
-//   editorRef.value = editor; // 记录 editor 实例，重要！
-// };
 const init = async () => {
   try {
     loaded.value = true;
     const r = await getSortList();
     if (!r.isValid) return;
     dialogVisibleForm.sortList = formatSort(r.data);
+    sortList.value = formatSort(r.data);
     const res = await getProductList();
     if (!res.isValid) return;
     productList.value = res.data;
     // 这里处理一级二级分类结构
     currentList.value = paginate(productList.value, pageNum, 1);
+  } finally {
+    loaded.value = false;
+  }
+};
+const handleChangeCurrent = (num) => {
+  currentList.value = paginate(productList.value, pageNum, num);
+};
+const handleFindListReset = async () => {
+  Object.assign(findForm, { ...findFormState });
+  await handleFindList();
+};
+const handleFindList = async () => {
+  try {
+    loaded.value = true;
+    const res = await getProductList(findForm);
+    if (!res.isValid) return;
+    productList.value = res.data;
+    currentList.value = paginate(productList.value, pageNum, 1);
+    pageinationPage.value = 1;
   } finally {
     loaded.value = false;
   }
@@ -203,7 +243,7 @@ const handleProductSubmit = async (item: any) => {
     margin-bottom: 20px;
   }
   .el-table {
-    margin-top: 40px;
+    margin-top: 20px;
     .img {
       width: 100px;
       height: 100px;
@@ -214,5 +254,10 @@ const handleProductSubmit = async (item: any) => {
       margin: 10px;
     }
   }
+}
+.pagination {
+  padding: 40px 0 0;
+  display: flex;
+  justify-content: center;
 }
 </style>

@@ -21,7 +21,8 @@ export const fetchRoleData = () => {
   });
 };
 // 用户
-export const getUserList = () => request({ url: "/user/list", method: "get" });
+export const getUserList = (params?: any) =>
+  request({ url: "/user/list", method: "get", params });
 // 上传图片
 export const uploadImage = (data: any) =>
   // @ts-ignore
@@ -36,8 +37,8 @@ export const removeSortList = (data) =>
   request({ url: "/sort/remove", method: "post", data });
 
 // 产品
-export const getProductList = () =>
-  request({ url: "/product/list", method: "get" });
+export const getProductList = (params) =>
+  request({ url: "/product/list", method: "get", params });
 
 // 添加产品
 export const addProductList = (data) =>
