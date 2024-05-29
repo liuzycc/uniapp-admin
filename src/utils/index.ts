@@ -1,3 +1,5 @@
+import { graphic } from "echarts/core";
+
 export const setProperty = (
   prop: string,
   val: any,
@@ -47,6 +49,126 @@ export const formatSort = (list) => {
   return res;
 };
 
+export const formatStatus = (status: 0 | 1 | 2) => {
+  let t = "";
+  switch (status) {
+    case 0:
+      t = "待处理";
+      break;
+    case 1:
+      t = "处理中";
+      break;
+    case 2:
+      t = "已完成";
+      break;
+  }
+  return t;
+};
+export const formatDate = (date: string) => {
+  const t = new Date(Number(date));
+  return `${t.getFullYear()}年${t.getMonth() + 1}月${t.getDate()}日`;
+};
 export const paginate = (array, pageSize, pageNumber) => {
   return array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+};
+export const colorRandom = () =>
+  "rgb(" +
+  [
+    Math.round(Math.random() * 127) + 110,
+    Math.round(Math.random() * 127) + 110,
+    Math.round(Math.random() * 127) + 110,
+  ].join(",") +
+  ")";
+
+export const getShopChatOptions = (list, date) => {
+  const opt = {
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: [],
+    },
+    yAxis: {
+      type: "value",
+    },
+    grid: {
+      top: "2%",
+      left: "2%",
+      right: "3%",
+      bottom: "2%",
+      containLabel: true,
+    },
+    color: ["#009688", "#f44336"],
+    series: [
+      {
+        type: "line",
+        areaStyle: {
+          color: new graphic.LinearGradient(0, 0, 0, 1, [
+            {
+              offset: 0,
+              color: "rgba(0, 150, 136,0.8)",
+            },
+            {
+              offset: 1,
+              color: "rgba(0, 150, 136,0.2)",
+            },
+          ]),
+        },
+        smooth: true,
+        data: [],
+      },
+      // {
+      //   type: "line",
+      //   smooth: true,
+      //   data: [220, 122, 191, 234, 190, 130, 310],
+      // },
+    ],
+    tooltip: {
+      show: true,
+    },
+  };
+  if (!list?.length || !date) {
+    return opt;
+  }
+  const dt = getAllDatesBetween(date[0], date[1]);
+  opt.xAxis.data = dt;
+  const n = new Array(dt.length).fill(0);
+  for (let i = 0; i < list.length; i++) {
+    const p = list[i].date;
+    if (!p) continue;
+    const idx = dt.findIndex((item) => isSameDay(item, Number(p)));
+    if (idx != -1) {
+      n[idx] += 1;
+    }
+  }
+  opt.series[0].data = n;
+  return opt;
+};
+// 获取两个日期之间的所有日期
+function getAllDatesBetween(startDate, endDate) {
+  const dates = [];
+  let currentDate = new Date(startDate.getTime());
+
+  while (currentDate <= endDate) {
+    dates.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dates.map((date) => date.toISOString().slice(0, 10));
+}
+// 判断是否为同一天
+function isSameDay(timestamp1, timestamp2) {
+  const date1 = new Date(timestamp1);
+  const date2 = new Date(timestamp2);
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+const secretKey = "sjl_857_token";
+export const generateToken = () => {
+  const today = new Date();
+  const dateString = today.toISOString().slice(0, 10); // 获取YYYY-MM-DD格式的日期
+  return btoa(`${dateString}-${secretKey}`); // Base64编码
 };

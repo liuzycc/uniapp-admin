@@ -118,6 +118,7 @@
         :file-list="imgInfo.fileList"
         :http-request="handleUpload"
         list-type="picture-card"
+        :accept="'image/*'"
         :on-preview="handlePictureCardPreview"
         :on-remove="handleRemove"
       >
@@ -204,7 +205,9 @@ import {
   onBeforeUnmount,
   nextTick,
 } from "vue";
+
 import type { UploadProps, UploadUserFile, ElInput } from "element-plus";
+import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 import "@wangeditor/editor/dist/css/style.css";

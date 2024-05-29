@@ -12,7 +12,6 @@ app.use(createPinia());
 app.use(router);
 // 注册elementplus图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-  console.log(key);
   app.component(key, component);
 }
 // 自定义权限指令

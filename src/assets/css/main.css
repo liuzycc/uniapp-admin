@@ -89,3 +89,10 @@ i {
 .w-e-bar-item-group:nth-last-child(10) .w-e-bar-item-menus-container .w-e-bar-item:nth-child(2) {
 		display: none;
   }
+
+  .el-table .warning-row {
+	--el-table-tr-bg-color: var(--el-color-warning-light-9);
+  }
+  .el-table .success-row {
+	--el-table-tr-bg-color: var(--el-color-success-light-9);
+  }

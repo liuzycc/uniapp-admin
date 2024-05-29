@@ -12,6 +12,10 @@ export const menuData: Menus[] = [
     icon: "Odometer",
     children: [
       {
+        index: "/theme",
+        title: "主题设置",
+      },
+      {
         index: "/util-image",
         title: "图片工具",
       },

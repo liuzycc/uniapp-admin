@@ -81,7 +81,7 @@
     <div class="pagination">
       <el-pagination
         layout="prev, pager, next"
-        :page-size="pageNum"
+        :page-size="page.num"
         :total="productList.length"
         @current-change="handleChangeCurrent"
         v-model:current-page="pageinationPage"
@@ -111,6 +111,7 @@ import {
   getSortList,
   updateProductList,
   addProductList,
+  removeProductList,
 } from "@/api";
 import { formatSort, paginate } from "@/utils";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
@@ -135,7 +136,10 @@ const sort2List = computed(() => {
 const productList = ref([]);
 const currentList = ref([]);
 const loaded = ref(false);
-const pageNum = 10;
+const page = {
+  num: 10,
+  index: 1,
+};
 // 表单弹窗
 const dialogVisibleForm = reactive({
   isShow: false,
@@ -159,20 +163,23 @@ const init = async () => {
     if (!r.isValid) return;
     dialogVisibleForm.sortList = formatSort(r.data);
     sortList.value = formatSort(r.data);
-    const res = await getProductList();
+    const res = await getProductList({});
     if (!res.isValid) return;
     productList.value = res.data;
     // 这里处理一级二级分类结构
-    currentList.value = paginate(productList.value, pageNum, 1);
+    currentList.value = paginate(productList.value, page.num, page.index);
   } finally {
     loaded.value = false;
   }
 };
 const handleChangeCurrent = (num) => {
-  currentList.value = paginate(productList.value, pageNum, num);
+  page.index = num;
+
+  currentList.value = paginate(productList.value, page.num, num);
 };
 const handleFindListReset = async () => {
   Object.assign(findForm, { ...findFormState });
+  page.index = 1;
   await handleFindList();
 };
 const handleFindList = async () => {
@@ -181,7 +188,7 @@ const handleFindList = async () => {
     const res = await getProductList(findForm);
     if (!res.isValid) return;
     productList.value = res.data;
-    currentList.value = paginate(productList.value, pageNum, 1);
+    currentList.value = paginate(productList.value, page.num, page.index);
     pageinationPage.value = 1;
   } finally {
     loaded.value = false;
@@ -198,7 +205,15 @@ const handleDetail = (t: any) => {
   dialogVisibleForm.formInfo = item;
   dialogVisibleForm.isShow = true;
 };
-const handleRemove = (item: any) => {};
+const handleRemove = async (item: any) => {
+  const res = await removeProductList({ id: item.id });
+  if (!res.isValid) return;
+  ElMessage({
+    message: "删除成功",
+    type: "success",
+  });
+  init();
+};
 const handleProductClose = () => {
   // debugger;
   dialogVisibleForm.isShow = false;

@@ -84,8 +84,8 @@ const dialogInfo = reactive({
   item: "",
 });
 const handelConfirmDislog = async () => {
+  if (!dialogInfo.sortName) return;
   try {
-    if (!dialogInfo.sortName) return;
     loading = ElLoading.service({
       lock: true,
       text: "请稍后",

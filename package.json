@@ -17,6 +17,7 @@
     "echarts": "^5.5.0",
     "echarts-wordcloud": "^2.1.0",
     "element-plus": "^2.6.3",
+    "jsonwebtoken": "^9.0.2",
     "md-editor-v3": "^2.11.2",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",

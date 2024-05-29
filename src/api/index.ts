@@ -47,3 +47,22 @@ export const addProductList = (data) =>
 export const updateProductList = (data) =>
   request({ url: "/product/update", method: "post", data });
 // 删除产品
+export const removeProductList = (data) =>
+  request({ url: "/product/remove", method: "post", data });
+// 订单
+export const getShopList = (params) =>
+  request({ url: "/shop/list", method: "get", params });
+
+// 修改订单状态
+export const updateShopList = (data) =>
+  request({ url: "/shop/update", method: "post", data });
+
+// 首页数据
+export const getHomeList = (params) =>
+  request({ url: "/home/list", method: "get", params });
+// 首页数据
+export const createHomeList = (data) =>
+  request({ url: "/home/create", method: "post", data });
+// 修改首页数据
+export const updateHomeList = (data) =>
+  request({ url: "/home/update", method: "post", data });
