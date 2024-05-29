@@ -215,7 +215,7 @@ const loaded = ref(false);
 
 // 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef();
-const info = reactive({
+const info = reactive<any>({
   userList: [],
   productList: [],
   shopList: [],

@@ -77,7 +77,7 @@ const formatSortList = ref([]);
 const currentList = ref([]);
 const loaded = ref(false);
 const pageNum = 10;
-const dialogInfo = reactive({
+const dialogInfo = reactive<any>({
   visible: false,
   title: "添加分类",
   sortName: "",

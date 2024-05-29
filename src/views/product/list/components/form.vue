@@ -299,7 +299,7 @@ const rules = reactive({
 });
 const model = ref(false);
 // config 弹窗
-const dialogFormConfig = reactive({
+const dialogFormConfig = reactive<any>({
   ...dialogFormConfigState,
 });
 // 编辑器实例，必须用 shallowRef
