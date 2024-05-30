@@ -20,7 +20,6 @@ service.interceptors.request.use(
     return config;
   },
   (error: AxiosError) => {
-    console.log(error);
     return Promise.reject();
   }
 );
