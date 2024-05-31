@@ -207,7 +207,7 @@ import {
 } from "vue";
 
 import type { UploadProps, UploadUserFile, ElInput } from "element-plus";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElLoading } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 import "@wangeditor/editor/dist/css/style.css";
@@ -384,6 +384,11 @@ const handlePictureCardPreview: UploadProps["onPreview"] = (uploadFile) => {
   imgInfo.dialogVisible = true;
 };
 const handleUpload = async ({ file }: any) => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: "请稍后",
+    background: "rgba(0,0,0,.2)",
+  });
   try {
     loaded.value = true;
     const formData = new FormData();
@@ -396,6 +401,7 @@ const handleUpload = async ({ file }: any) => {
     form.imgs = imgInfo.fileList;
   } finally {
     loaded.value = false;
+    loading.close();
   }
 };
 // imgs cbfn end
