@@ -79,7 +79,7 @@ onMounted(() => {
     router.push("/");
   }
 });
-const submitForm = (formEl: FormInstance | undefined) => {
+const submitForm = (formEl: any) => {
   if (!formEl) return;
   formEl.validate((valid: boolean) => {
     if (valid) {
