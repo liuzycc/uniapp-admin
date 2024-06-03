@@ -52,6 +52,7 @@
                     <span>{{ itm.name }}：</span>
                     {{ `${itm.selectList.join(",")}` }}
                   </p>
+                  <p>单价：{{ item.productInfo.price || 0 }}元</p>
                   <p>数量：x{{ item.num }}</p>
                 </div>
               </div>
@@ -171,7 +172,7 @@ onMounted(async () => {
 const init = async () => {
   const res = await getShopList({});
   if (!res.isValid) return;
-  shopList.value = res.data;
+  shopList.value = res.data.reverse();
   shopCurrentList.value = paginate(res.data, page.num, page.index);
 };
 const handleChangeCurrent = (num) => {

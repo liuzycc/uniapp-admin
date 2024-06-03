@@ -55,6 +55,20 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item label="价格(元)" prop="price" :label-width="formLabelWidth">
+        <el-input-number
+          v-model="form.price"
+          :min="0"
+          :precision="2"
+          :step="0.1"
+        />
+      </el-form-item>
+      <el-form-item label="库存" :label-width="formLabelWidth">
+        <el-input-number v-model="form.count" :min="0" />
+      </el-form-item>
+      <el-form-item label="已售数量" :label-width="formLabelWidth">
+        <el-input-number v-model="form.sellNum" :min="0" />
+      </el-form-item>
       <!-- 标签 -->
       <el-form-item label="标签" :label-width="formLabelWidth">
         <div class="flex">
@@ -85,12 +99,6 @@
             + 新标签
           </el-button>
         </div>
-      </el-form-item>
-      <el-form-item label="库存" :label-width="formLabelWidth">
-        <el-input-number v-model="form.count" :min="0" />
-      </el-form-item>
-      <el-form-item label="已售数量" :label-width="formLabelWidth">
-        <el-input-number v-model="form.sellNum" :min="0" />
       </el-form-item>
     </el-form>
     <!-- 编辑器 -->
@@ -222,6 +230,7 @@ const formState = {
   thum: "",
   sort1: "",
   sort2: "",
+  price: 0,
   count: 0,
   sellNum: 0,
   info: "",
@@ -293,6 +302,13 @@ const rules = reactive({
     {
       required: true,
       message: "请选择二级分类",
+      trigger: "blur",
+    },
+  ],
+  price: [
+    {
+      required: true,
+      message: "请填写价格",
       trigger: "blur",
     },
   ],
@@ -454,6 +470,10 @@ const handleSubmit = async (ruleFormRef) => {
       emit("submit", JSON.parse(JSON.stringify(form)));
     } else {
       console.log("error submit!", fields);
+      ElMessage({
+        message: "存在必填项未填写",
+        type: "error",
+      });
     }
   });
 };
