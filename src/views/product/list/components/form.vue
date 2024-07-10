@@ -59,7 +59,7 @@
         <el-input-number
           v-model="form.price"
           :min="0"
-          :precision="2"
+          :precision="1"
           :step="0.1"
         />
       </el-form-item>
@@ -344,6 +344,8 @@ watch(
   () => props.formInfo,
   (v: any) => {
     if (!Object.keys(v).length) {
+      formState.tags = [];
+      formState.info = "";
       Object.assign(form, { ...formState });
       Object.assign(imgInfo, { ...imgInfoState });
       return;

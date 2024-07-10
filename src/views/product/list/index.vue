@@ -195,6 +195,7 @@ const handleFindList = async () => {
   }
 };
 const handleAddProcuct = () => {
+  dialogVisibleForm.formInfo = {};
   dialogVisibleForm.isShow = true;
 };
 const handleDetail = (t: any) => {
@@ -238,6 +239,7 @@ const handleProductSubmit = async (item: any) => {
       item.tags = JSON.stringify(item.tags);
       item.imgs = JSON.stringify(item.imgs);
       item.config = JSON.stringify(item.config);
+      delete item.id;
       const res = await addProductList({ ...item, isDelete: 0 });
       if (!res.isValid) return;
       ElMessage({
