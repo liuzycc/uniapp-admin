@@ -45,7 +45,7 @@
       <el-pagination
         layout="prev, pager, next"
         :page-size="pageNum"
-        :total="currentList.length"
+        :total="formatSortList.length"
         @current-change="handleChangeCurrent"
       />
     </div>
