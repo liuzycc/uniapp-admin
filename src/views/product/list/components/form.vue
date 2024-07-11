@@ -66,6 +66,9 @@
       <el-form-item label="库存" :label-width="formLabelWidth">
         <el-input-number v-model="form.count" :min="0" />
       </el-form-item>
+      <el-form-item label="需定制文案" :label-width="formLabelWidth">
+        <el-input v-model="form.tip" autocomplete="off" />
+      </el-form-item>
       <el-form-item label="已售数量" :label-width="formLabelWidth">
         <el-input-number v-model="form.sellNum" :min="0" />
       </el-form-item>
@@ -232,6 +235,7 @@ const formState = {
   sort2: "",
   price: 0,
   count: 0,
+  tip: "",
   sellNum: 0,
   info: "",
   config: [],

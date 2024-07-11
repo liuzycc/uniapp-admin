@@ -33,6 +33,9 @@ export const getSortList = (): any =>
 // 添加分类
 export const addSortList = (data): any =>
   request({ url: "/sort/create", method: "post", data });
+// 更新分类
+export const updataSortList = (data): any =>
+  request({ url: "/sort/update", method: "post", data });
 // 删除分类
 export const removeSortList = (data): any =>
   request({ url: "/sort/remove", method: "post", data });

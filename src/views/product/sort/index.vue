@@ -2,7 +2,62 @@
   <div class="container">
     <p class="title">分类管理</p>
     <el-button type="primary" @click="handleAddFirst">添加一级分类</el-button>
-    <el-table :data="currentList" stripe style="width: 100%">
+    <el-table
+      :data="currentList"
+      stripe
+      style="width: 100%"
+      :row-key="
+        (row) => {
+          return row.s1.id;
+        }
+      "
+      :expand-row-keys="expandedRowKeys"
+      @expand-change="expandOpen"
+    >
+      <el-table-column type="expand">
+        <template #default="scope">
+          <div class="table-info">
+            <div class="select-box">
+              <el-select
+                placeholder="请选择二级分类"
+                style="width: 240px"
+                v-model="scope.row.selectValud"
+                @change="handleSelect(scope.row)"
+              >
+                <el-option
+                  v-for="item in scope.row.s2"
+                  :key="item.id"
+                  :label="item.title"
+                  :value="item.id"
+                />
+              </el-select>
+            </div>
+            <div class="tb" v-if="scope.row.productList?.length">
+              <Draggable
+                class="list-group"
+                :component-data="{
+                  tag: 'ul',
+                  type: 'transition-group',
+                  name: !drag ? 'flip-list' : null,
+                }"
+                v-model="scope.row.productList"
+                v-bind="dragOptions"
+                @start="drag = true"
+                @end="handleMoveProductListEnd(scope.row)"
+                item-key="id"
+              >
+                <template #item="{ element: row }">
+                  <li class="list-group-item production-list">
+                    <img :src="row.thum" alt="" />
+                    <p>{{ row.title }}</p>
+                  </li>
+                </template>
+              </Draggable>
+            </div>
+            <div class="empty" v-else>暂无数据</div>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="分类">
         <template #default="scope">
           <div>
@@ -16,16 +71,32 @@
           <div style="">
             <p>分类2级</p>
             <div class="">
-              <el-tag
-                v-for="tag in scope.row.s2"
-                :key="tag.id"
-                type="info"
-                closable
-                :disable-transitions="false"
-                @close="handleClose(tag)"
+              <Draggable
+                class="list-group"
+                :component-data="{
+                  tag: 'ul',
+                  type: 'transition-group',
+                  name: !drag ? 'flip-list' : null,
+                }"
+                v-model="scope.row.s2"
+                v-bind="dragOptions"
+                @start="drag = true"
+                @end="handleMoveEnd(scope.row)"
+                item-key="id"
               >
-                {{ tag.title }}
-              </el-tag>
+                <template #item="{ element: tag }">
+                  <li class="list-group-item">
+                    <el-tag
+                      type="info"
+                      closable
+                      :disable-transitions="false"
+                      @close="handleClose(tag)"
+                    >
+                      {{ tag.title }}
+                    </el-tag>
+                  </li>
+                </template>
+              </Draggable>
             </div>
           </div>
         </template>
@@ -68,8 +139,16 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from "vue";
-import { getSortList, addSortList, removeSortList } from "@/api";
+import {
+  getSortList,
+  addSortList,
+  updataSortList,
+  removeSortList,
+  getProductList,
+  updateProductList,
+} from "@/api";
 import { ElLoading, ElMessageBox, ElMessage } from "element-plus";
+import Draggable from "vuedraggable";
 import { formatSort, paginate } from "@/utils";
 let loading: any = null;
 const sortList = ref<any>([]);
@@ -77,6 +156,14 @@ const formatSortList = ref([]);
 const currentList = ref([]);
 const loaded = ref(false);
 const pageNum = 10;
+const drag = ref(false);
+const expandedRowKeys = ref([]);
+const dragOptions = reactive({
+  animation: 200,
+  group: "description",
+  disabled: false,
+  ghostClass: "ghost",
+});
 const dialogInfo = reactive<any>({
   visible: false,
   title: "添加分类",
@@ -187,6 +274,51 @@ const handleAdd = (tag: any) => {
 const handleAddFirst = () => {
   dialogInfo.visible = true;
 };
+const handleMoveEnd = (v) => {
+  drag.value = false;
+  if (v.s2?.length <= 1) return;
+  v.s2.forEach(async (item, index) => {
+    await updataSortList({ id: item.id, sort: index });
+  });
+};
+const handleMoveProductListEnd = (v) => {
+  drag.value = false;
+  if (v.productList?.length <= 1) return;
+  v.productList.forEach(async (item, index) => {
+    await updateProductList({ id: item.id, psort: index });
+  });
+};
+// 表格优化
+const remove = (array: any[], val: any) => {
+  const index = array.findIndex((item) => item === val);
+  if (index > -1) {
+    array.splice(index, 1);
+    return true;
+  }
+  return false;
+};
+const expandOpen = async (row: any, expand: any) => {
+  if (!remove(expandedRowKeys.value, row.s1.id)) {
+    expandedRowKeys.value.push(row.s1.id);
+  }
+};
+const handleSelect = async (row: any) => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: "请稍后",
+    background: "rgba(0,0,0,.2)",
+  });
+  try {
+    const res = await getProductList({
+      sort1: row.s1.id,
+      sort2: row.selectValud,
+    });
+    if (!res.isValid) return;
+    row.productList = res.data.sort((a, b) => a.psort - b.psort);
+  } finally {
+    loading.close();
+  }
+};
 </script>
 <style scss scoped>
 .container {
@@ -199,11 +331,15 @@ const handleAddFirst = () => {
       display: block;
       width: 100%;
     }
+    .list-group-item {
+      display: inline-block;
+    }
     .el-tag {
-      margin: 20px;
+      margin: 10px 20px;
       font-size: 15px;
       font-weight: bold;
       padding: 15px 10px;
+      cursor: pointer;
     }
   }
   .el-table {
@@ -217,6 +353,65 @@ const handleAddFirst = () => {
   .el-button {
     display: block;
     margin: 10px;
+  }
+}
+/* 拖拽 */
+.flip-list-move {
+  transition: transform 0.5s;
+}
+
+.no-move {
+  transition: transform 0s;
+}
+
+.ghost {
+  opacity: 0.5;
+  background: var(--header-bg-color);
+  border-radius: 7px;
+}
+
+.list-group {
+  min-height: 20px;
+}
+
+.list-group-item {
+  cursor: move;
+}
+
+.list-group-item i {
+  cursor: pointer;
+}
+.table-info {
+  padding: 20px;
+  text-align: center;
+  .select-box {
+    display: flex;
+    align-items: center;
+  }
+  .empty {
+    width: 100%;
+    text-align: center;
+    padding: 30px;
+    color: rgba(0, 0, 0, 0.2);
+  }
+  .list-group {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding: 20px 0;
+  }
+  .production-list {
+    text-align: center;
+    font-size: 12px;
+    margin: 10px;
+    width: 100px;
+    padding: 5px;
+    img {
+      width: 100px;
+      height: 100px;
+      border-radius: 7px;
+    }
   }
 }
 </style>

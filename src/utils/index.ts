@@ -40,7 +40,9 @@ export const formatSort = (list) => {
   }
   for (let i = 0; i < sort1.length; i++) {
     const t = sort1[i];
-    const tl = sort2.filter((item) => item.level2 === t.id);
+    const tl = sort2
+      .filter((item) => item.level2 === t.id)
+      .sort((a, b) => a.sort - b.sort);
     res.push({
       s1: t,
       s2: tl,
