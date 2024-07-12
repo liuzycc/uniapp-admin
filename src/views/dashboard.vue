@@ -270,14 +270,18 @@ onActivated(async () => {
 const pidOptions = computed(() => {
   const dashOptions = {
     legend: {
-      bottom: "1%",
+      bottom: "0",
       left: "center",
     },
     color: [],
     series: [
       {
+        minAngle: 15, //最小角度
+        startAngle: 270, //起始角度
+        center: ["50%", "30%"],
         type: "pie",
-        radius: ["40%", "70%"],
+        // radius: ["40%", "70%"],
+        radius: "50%",
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 10,
@@ -493,8 +497,11 @@ const handleSubmit = async () => {
 }
 
 .chart {
-  width: 100%;
+  min-width: 250px;
+  max-width: 100%;
   height: 400px;
+  margin: 0 auto;
+  overflow: auto;
 }
 
 .card-header {
@@ -502,7 +509,8 @@ const handleSubmit = async () => {
   margin-bottom: 20px;
 }
 .card-header.pid {
-  padding-bottom: 52px;
+  padding-bottom: 20px;
+  margin-bottom: 0;
 }
 .card-header-title {
   font-size: 18px;
