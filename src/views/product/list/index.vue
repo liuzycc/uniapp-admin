@@ -225,6 +225,7 @@ const handleProductSubmit = async (item: any) => {
       // 修改
       delete item.sort1Name;
       delete item.sort2Name;
+      delete item.sort2sort;
       item.tags = JSON.stringify(item.tags);
       item.imgs = JSON.stringify(item.imgs);
       item.config = JSON.stringify(item.config);
