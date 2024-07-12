@@ -222,6 +222,7 @@ const handleProductClose = () => {
 const handleProductSubmit = async (item: any) => {
   try {
     if (Object.keys(dialogVisibleForm.formInfo).length) {
+      // 修改
       delete item.sort1Name;
       delete item.sort2Name;
       delete item.sort2sort;
