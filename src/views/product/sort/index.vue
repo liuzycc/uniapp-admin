@@ -90,6 +90,7 @@
                       type="info"
                       closable
                       :disable-transitions="false"
+                      @click="handleDetail(tag)"
                       @close="handleClose(tag)"
                     >
                       {{ tag.title }}
@@ -266,6 +267,30 @@ const handleClose = async (tag: any) => {
   } finally {
     loading.close();
   }
+};
+const handleDetail = async (tag: any) => {
+  console.log(tag);
+  ElMessageBox.prompt("分类名称", "二级分类修改", {
+    confirmButtonText: "修改",
+    cancelButtonText: "取消",
+    inputValue: tag.title,
+    inputPattern: /\S/,
+    inputErrorMessage: "不可为空",
+    draggable: true,
+  })
+    .then(async ({ value }) => {
+      const res = await updataSortList({ id: tag.id, title: value });
+      if (!res.isValid) {
+        ElMessage.error("保存失败请重试");
+        return;
+      }
+      tag.title = value;
+      ElMessage({
+        type: "success",
+        message: `保存成功`,
+      });
+    })
+    .catch(() => {});
 };
 const handleAdd = (tag: any) => {
   dialogInfo.item = tag;
