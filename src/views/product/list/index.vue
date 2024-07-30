@@ -117,7 +117,7 @@ import { formatSort, paginate } from "@/utils";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 import "@wangeditor/editor/dist/css/style.css";
 import ProductForm from "./components/form.vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 const findFormState = {
   title: "",
@@ -207,13 +207,16 @@ const handleDetail = (t: any) => {
   dialogVisibleForm.isShow = true;
 };
 const handleRemove = async (item: any) => {
-  const res = await removeProductList({ id: item.id });
-  if (!res.isValid) return;
-  ElMessage({
-    message: "删除成功",
-    type: "success",
-  });
-  init();
+  try {
+    await ElMessageBox.confirm(`确定删除商品【${item.title}】吗？`);
+    const res = await removeProductList({ id: item.id });
+    if (!res.isValid) return;
+    ElMessage({
+      message: "删除成功",
+      type: "success",
+    });
+    init();
+  } catch {}
 };
 const handleProductClose = () => {
   // debugger;
