@@ -168,6 +168,7 @@ const init = async () => {
     productList.value = res.data;
     // 这里处理一级二级分类结构
     currentList.value = paginate(productList.value, page.num, page.index);
+    console.error(currentList.value);
   } finally {
     loaded.value = false;
   }
@@ -179,17 +180,17 @@ const handleChangeCurrent = (num) => {
 };
 const handleFindListReset = async () => {
   Object.assign(findForm, { ...findFormState });
-  page.index = 1;
   await handleFindList();
 };
 const handleFindList = async () => {
   try {
     loaded.value = true;
+    page.index = 1;
     const res = await getProductList(findForm);
     if (!res.isValid) return;
     productList.value = res.data;
-    currentList.value = paginate(productList.value, page.num, page.index);
     pageinationPage.value = 1;
+    currentList.value = paginate(productList.value, page.num, page.index);
   } finally {
     loaded.value = false;
   }
