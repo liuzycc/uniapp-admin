@@ -27,6 +27,10 @@ export const menuData: Menus[] = [
     icon: "HomeFilled",
     children: [
       {
+        index: "/product-home",
+        title: "首页配置",
+      },
+      {
         index: "/product-sort",
         title: "分类管理",
       },

@@ -37,7 +37,9 @@
       <el-button type="primary" @click="handleFindListReset">重置</el-button>
       <el-button type="primary" @click="handleFindList">查询</el-button>
     </div>
-    <el-button type="primary" @click="handleAddProcuct">添加产品</el-button>
+    <el-button v-if="!isAddSearch" type="primary" @click="handleAddProcuct"
+      >添加产品</el-button
+    >
     <el-table
       v-loading="loaded"
       :data="currentList"
@@ -69,11 +71,23 @@
       <el-table-column label="已售数量" prop="sellNum" />
       <el-table-column label="操作" width="100">
         <template #default="scope">
-          <el-button type="primary" @click="handleDetail(scope.row)"
+          <el-button
+            v-if="!isAddSearch"
+            type="primary"
+            @click="handleDetail(scope.row)"
             >编辑</el-button
           >
-          <el-button type="primary" @click="handleRemove(scope.row)"
+          <el-button
+            v-if="!isAddSearch"
+            type="primary"
+            @click="handleRemove(scope.row)"
             >删除</el-button
+          >
+          <el-button
+            v-if="isAddSearch"
+            type="primary"
+            @click="handleAdd(scope.row)"
+            >添加</el-button
           >
         </template>
       </el-table-column>
@@ -118,7 +132,24 @@ import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 import "@wangeditor/editor/dist/css/style.css";
 import ProductForm from "./components/form.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-
+const props = defineProps({
+  isAddSearch: {
+    type: Number,
+    default: 0,
+    required: false,
+  },
+  addType: {
+    type: Number,
+    default: 0,
+    required: false,
+  },
+  addTypeProductList: {
+    type: Object,
+    default: [],
+    required: false,
+  },
+});
+const emits = defineEmits(["addSubmit"]);
 const findFormState = {
   title: "",
   sort1: "",
@@ -168,7 +199,6 @@ const init = async () => {
     productList.value = res.data;
     // 这里处理一级二级分类结构
     currentList.value = paginate(productList.value, page.num, page.index);
-    console.error(currentList.value);
   } finally {
     loaded.value = false;
   }
@@ -219,8 +249,53 @@ const handleRemove = async (item: any) => {
     init();
   } catch {}
 };
+const handleAdd = async (row: any) => {
+  const item = JSON.parse(JSON.stringify(row));
+  // 判断不可重复添加
+  const td = props.addTypeProductList.find((itm) => itm.id === item.id);
+  if (td) {
+    ElMessageBox.alert(`不可重复添加`);
+    return;
+  }
+  let title = "";
+  switch (props.addType) {
+    case 1:
+      title = "首页轮播";
+      break;
+    case 2:
+      title = "现货特价";
+      break;
+    case 3:
+      title = "新品专区";
+      break;
+  }
+  try {
+    await ElMessageBox.confirm(
+      `确定添加商品【${item.title}】到【${title}】吗？`
+    );
+    switch (props.addType) {
+      case 1:
+        item.isHomeSwiper = 1;
+        item.homeSwiperNum = props.addTypeProductList.length + 1;
+        break;
+      case 2:
+        item.isHomeCheap = 1;
+        item.homeCheapNum = props.addTypeProductList.length + 1;
+        break;
+      case 3:
+        item.isHomeNewProduct = 1;
+        item.homeNewProductNum = props.addTypeProductList.length + 1;
+        break;
+    }
+    delete item.sort1Name;
+    delete item.sort2Name;
+    delete item.sort2sort;
+    const res = await updateProductList(item);
+    if (!res.isValid) return;
+    emits("addSubmit", item);
+  } catch {}
+};
 const handleProductClose = () => {
-  // debugger;
   dialogVisibleForm.isShow = false;
 };
 const handleProductSubmit = async (item: any) => {

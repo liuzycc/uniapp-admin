@@ -45,6 +45,17 @@ const routes: RouteRecordRaw[] = [
           ),
       },
       {
+        path: "/product-home",
+        name: "product-home",
+        meta: {
+          title: "首页配置",
+        },
+        component: () =>
+          import(
+            /* webpackChunkName: "product-home" */ "../views/product/home/index.vue"
+          ),
+      },
+      {
         path: "/product-sort",
         name: "product-sort",
         meta: {
