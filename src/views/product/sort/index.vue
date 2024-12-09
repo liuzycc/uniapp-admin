@@ -63,7 +63,7 @@
           <div>
             <p>分类1级</p>
             <div class="">
-              <el-tag type="warning">
+              <el-tag type="warning" @click="handleDetailFirst(scope.row.s1)">
                 {{ scope.row.s1.title }}
               </el-tag>
             </div>
@@ -147,6 +147,7 @@ import {
   removeSortList,
   getProductList,
   updateProductList,
+  removeProductList,
 } from "@/api";
 import { ElLoading, ElMessageBox, ElMessage } from "element-plus";
 import Draggable from "vuedraggable";
@@ -227,11 +228,21 @@ const handleRemove = async (info: any) => {
       text: "请稍后",
       background: "rgba(0,0,0,.2)",
     });
-    const idList = [info.s1.id];
-    info.s2.forEach((item) => {
+    const idList = [];
+    info.s2.forEach(async (item) => {
       idList.push(item.id);
+      // 移除二级分类下的所有产品
+      const productList = await getProductList({ sort2: item.id });
+      if (!productList.isValid) return;
+      productList.data.forEach(async (itm) => {
+        await removeProductList({ id: itm.id });
+      });
     });
-    const res = await removeSortList({ idList });
+    // 移除二级分类
+    const res2 = await removeSortList({ idList });
+    if (!res2.isValid) return;
+    // 移除一级分类
+    const res = await removeSortList({ idList: [info.s1.id] });
     if (!res.isValid) return;
     ElMessage({
       message: "移除成功",
@@ -253,6 +264,14 @@ const handleClose = async (tag: any) => {
       text: "请稍后",
       background: "rgba(0,0,0,.2)",
     });
+    // 移除商品
+    const productList = await getProductList({ sort2: tag.id });
+    if (!productList.isValid) return;
+    productList.data.forEach(async (item) => {
+      await removeProductList({ id: item.id });
+    });
+
+    // 移除分类
     console.log(tag.id);
     const res = await removeSortList({ idList: [tag.id] });
     if (!res.isValid) return;
@@ -271,6 +290,29 @@ const handleClose = async (tag: any) => {
 const handleDetail = async (tag: any) => {
   console.log(tag);
   ElMessageBox.prompt("分类名称", "二级分类修改", {
+    confirmButtonText: "修改",
+    cancelButtonText: "取消",
+    inputValue: tag.title,
+    inputPattern: /\S/,
+    inputErrorMessage: "不可为空",
+    draggable: true,
+  })
+    .then(async ({ value }) => {
+      const res = await updataSortList({ id: tag.id, title: value });
+      if (!res.isValid) {
+        ElMessage.error("保存失败请重试");
+        return;
+      }
+      tag.title = value;
+      ElMessage({
+        type: "success",
+        message: `保存成功`,
+      });
+    })
+    .catch(() => {});
+};
+const handleDetailFirst = async (tag: any) => {
+  ElMessageBox.prompt("分类名称", "一级分类修改", {
     confirmButtonText: "修改",
     cancelButtonText: "取消",
     inputValue: tag.title,
